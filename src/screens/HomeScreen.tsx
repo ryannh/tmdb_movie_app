@@ -1,25 +1,20 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect } from 'react';
 import MovieCard from '../components/MovieCard';
-import {Movie} from '../types';
-// import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../navigation/RootNavigator';
-import {fetchPopularMovies} from '../api/tmdb';
 import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import useMovie from '../hooks/useMovie';
-import {useNavigation} from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-// type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-export default function HomeScreen({navigation}: any) {
-  const {movies, handleFetchMovies, loading} = useMovie();
-  // const navigation = useNavigation();
+export default function HomeScreen({ navigation }: Props) {
+  const { movies, handleFetchMovies, loading } = useMovie();
 
   useEffect(() => {
     handleFetchMovies();
@@ -47,10 +42,10 @@ export default function HomeScreen({navigation}: any) {
       refreshControl={
         <RefreshControl refreshing={loading} onRefresh={onRefresh} />
       }
-      renderItem={({item}) => (
+      renderItem={({ item }) => (
         <MovieCard
           movie={item}
-          onPress={() => navigation.navigate('Detail', {id: item.id})}
+          onPress={() => navigation.navigate('Detail', { id: item.id })}
         />
       )}
     />
@@ -64,5 +59,5 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
   },
-  center: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
