@@ -79,7 +79,7 @@ android {
 
     namespace "com.tmdbmovieapp"
     defaultConfig {
-        applicationId "com.tmdbmovieapp"
+        applicationId "com.tmdbmovieapp.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

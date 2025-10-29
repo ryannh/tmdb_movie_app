@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   View,
   Text,
@@ -16,6 +15,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/reducers';
 import { ADD_FAVORITE, REMOVE_FAVORITE } from '../redux/actions/favorite';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+
 type Props = NativeStackScreenProps<RootStackParamList, 'Detail'>;
 
 export default function DetailScreen({ route }: Props) {
@@ -34,6 +36,13 @@ export default function DetailScreen({ route }: Props) {
       dispatch({ type: ADD_FAVORITE, payload: movie });
     }
   };
+
+  const handleCopyLink = () => {
+    const url = `https://tmdbmovie-tau.vercel.app/movie/${id}`;
+    Clipboard.setString(url);
+    Alert.alert('Link Copied!', 'Movie link has been copied to clipboard.');
+  };
+
   useEffect(() => {
     handleFetchMovieDetail(id);
   }, [id]);
@@ -61,6 +70,11 @@ export default function DetailScreen({ route }: Props) {
       <TouchableOpacity onPress={toggleFavorite}>
         {isFavorite ? <Text>Love active</Text> : <Text>Love inactive</Text>}
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleCopyLink}>
+        <Text>Share</Text>
+      </TouchableOpacity>
+
       <Text style={styles.meta}>
         ⭐ {movie.vote_average} • {movie.release_date}
       </Text>
