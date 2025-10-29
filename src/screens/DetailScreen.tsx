@@ -6,27 +6,36 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
-import {fetchMovieDetail} from '../api/tmdb';
-// import type {NativeStackScreenProps} from '@react-navigation/stack';
-import {RootStackParamList} from '../navigation/RootNavigator';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import useMovie from '../hooks/useMovie';
+import { useEffect } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/reducers';
+import { ADD_FAVORITE, REMOVE_FAVORITE } from '../redux/actions/favorite';
+type Props = NativeStackScreenProps<RootStackParamList, 'Detail'>;
 
-// type Props = NativeStackScreenProps<RootStackParamList, 'Detail'>;
+export default function DetailScreen({ route }: Props) {
+  const { id } = route.params;
+  const { movieDetail: movie, handleFetchMovieDetail, loading } = useMovie();
 
-export default function DetailScreen({route}: any) {
-  const {id} = route.params;
-  const [movie, setMovie] = React.useState<any | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const dispatch = useDispatch();
+  const favorites = useSelector((state: RootState) => state.favorite.favorites);
 
-  React.useEffect(() => {
-    let mounted = true;
-    fetchMovieDetail(id)
-      .then(m => mounted && setMovie(m))
-      .catch(e => console.warn(e))
-      .finally(() => mounted && setLoading(false));
-    return () => {
-      mounted = false;
-    };
+  const isFavorite = favorites.some(m => m.id === movie?.id);
+
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      dispatch({ type: REMOVE_FAVORITE, payload: movie?.id });
+    } else {
+      dispatch({ type: ADD_FAVORITE, payload: movie });
+    }
+  };
+  useEffect(() => {
+    handleFetchMovieDetail(id);
   }, [id]);
 
   if (loading) {
@@ -45,8 +54,13 @@ export default function DetailScreen({route}: any) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {poster && <Image source={{uri: poster}} style={styles.poster} />}
+      {poster && <Image source={{ uri: poster }} style={styles.poster} />}
+
       <Text style={styles.title}>{movie.title}</Text>
+
+      <TouchableOpacity onPress={toggleFavorite}>
+        {isFavorite ? <Text>Love active</Text> : <Text>Love inactive</Text>}
+      </TouchableOpacity>
       <Text style={styles.meta}>
         ⭐ {movie.vote_average} • {movie.release_date}
       </Text>
@@ -56,10 +70,10 @@ export default function DetailScreen({route}: any) {
 }
 
 const styles = StyleSheet.create({
-  container: {padding: 16},
-  poster: {width: '100%', height: 420, borderRadius: 8},
-  title: {fontSize: 22, fontWeight: '700', marginTop: 12},
-  meta: {color: '#666', marginTop: 6, marginBottom: 12},
-  overview: {fontSize: 16, lineHeight: 22},
-  center: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  container: { padding: 16 },
+  poster: { width: '100%', height: 420, borderRadius: 8 },
+  title: { fontSize: 22, fontWeight: '700', marginTop: 12 },
+  meta: { color: '#666', marginTop: 6, marginBottom: 12 },
+  overview: { fontSize: 16, lineHeight: 22 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

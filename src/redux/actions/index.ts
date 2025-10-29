@@ -1,3 +1,4 @@
 import * as MovieAction from './movie';
+import * as FavoriteAction from './favorite';
 
-export {MovieAction};
+export { MovieAction, FavoriteAction };
