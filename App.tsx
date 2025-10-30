@@ -1,49 +1,50 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import RootNavigator from './src/navigation/RootNavigator';
+import RootNavigator, {
+  RootStackParamList,
+} from './src/navigation/RootNavigator';
 import { store, persistor } from './src/redux/stores';
 import { Linking, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 
 const linking = {
-  prefixes: ['tmdbmovieapp://', 'https://tmdbmovie-tau.vertex.app'],
+  prefixes: ['tmdbmovieapp://', 'https://tmdbmovie-tau.vercel.app'],
   config: {
     screens: {
       Home: '',
-      MovieDetails: 'movie/:id',
+      Detail: 'movie/:id',
     },
   },
 };
 
 export default function App() {
+  const navigationRef =
+    useRef<NavigationContainerRef<RootStackParamList>>(null);
+
   useEffect(() => {
-    const getUrlAsync = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      if (initialUrl) {
-        // maybe navigate manually if needed
+    const handleDeepLink = (event: { url: string }) => {
+      const { url } = event;
+      console.log('🔗 Deep link received:', url);
+
+      const match = url.match(/\/movie\/(\d+)/);
+      if (match && match[1]) {
+        const movieId = match[1];
+        console.log('➡ Navigating to movie ID:', movieId);
+        navigationRef.current?.navigate('Detail', { id: Number(movieId) });
       }
     };
-    getUrlAsync();
 
-    const subscriber = Linking.addEventListener('url', ({ url }) => {
-      // handle url when app is already open
-    });
-
-    return () => subscriber.remove();
-  }, []);
-
-  useEffect(() => {
-    const handleDeepLink = (event: any) => {
-      console.log('Incoming link:', event.url);
-    };
-
-    const subscription = Linking.addEventListener('url', handleDeepLink);
-
+    // Handle saat app dibuka lewat link
     Linking.getInitialURL().then(url => {
-      if (url) console.log('Initial URL:', url);
+      if (url) handleDeepLink({ url });
     });
 
+    // Handle saat app sudah terbuka
+    const subscription = Linking.addEventListener('url', handleDeepLink);
     return () => subscription.remove();
   }, []);
 
@@ -52,6 +53,7 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer
           linking={linking}
+          ref={navigationRef}
           fallback={<Text>Loading...</Text>}
         >
           <RootNavigator />
