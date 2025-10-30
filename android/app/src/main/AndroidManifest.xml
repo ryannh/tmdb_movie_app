@@ -30,7 +30,7 @@
             <!-- Universal Link -->
             <data
               android:scheme="https"
-              android:host="tmdbmovie-tau.vertex.app"
+              android:host="tmdbmovie-tau.vercel.app"
               android:pathPrefix="/" />
 
             <!-- Custom Scheme -->

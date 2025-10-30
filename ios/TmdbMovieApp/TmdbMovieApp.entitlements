@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:tmdbmovie-tau.vertex.app</string>
+		<string>applinks:tmdbmovie-tau.vercel.app</string>
 	</array>
 </dict>
 </plist>
